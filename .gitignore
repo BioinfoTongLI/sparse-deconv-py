@@ -1,0 +1,5 @@
+.nextflow*
+*.un~
+*.swp
+
+output/
