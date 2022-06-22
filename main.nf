@@ -3,6 +3,8 @@
 
 nextflow.enable.dsl=2
 
+include { bf2raw } from '../gmm-decoding/main.nf'
+
 params.img = ""
 params.ourdir = "./output/"
 
@@ -18,12 +20,12 @@ process deconv {
     publishDir params.ourdir, mode :"copy"
 
     input:
-    path img
+    tuple val(stem), path(img)
     val pixelsize
     val resolution
 
     output:
-    path "${stem}_processed.tif"
+    path "${stem}.zarr"
 
     script:
     stem = img.baseName
@@ -35,5 +37,6 @@ process deconv {
 
 
 workflow {
-    deconv(params.img, params.pixelsize, params.resolution)
+    bf2raw(channel.fromPath(params.img))
+    deconv(bf2raw.out, params.pixelsize, params.resolution)
 }
